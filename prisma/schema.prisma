@@ -16,6 +16,7 @@ model User {
   password    String    @db.VarChar(60)
   role        String    @map("role") @db.VarChar(50)
   logoUrl     String?   @map("logo_url") @db.VarChar(2183)
+  backgroundUrl String? @map("background_url") @db.Text
   displayName String?   @map("display_name") @db.VarChar(255)
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)

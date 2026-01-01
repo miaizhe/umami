@@ -29,6 +29,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ use
     username: z.string().max(255).optional(),
     password: z.string().max(255).optional(),
     role: userRoleParam.optional(),
+    logoUrl: z.string().max(2183).optional(),
+    backgroundUrl: z.string().optional(),
+    displayName: z.string().max(255).optional(),
   });
 
   const { auth, body, error } = await parseRequest(request, schema);
@@ -43,7 +46,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ use
     return unauthorized();
   }
 
-  const { username, password, role } = body;
+  const { username, password, role, logoUrl, backgroundUrl, displayName } = body;
 
   const user = await getUser(userId);
 
@@ -51,6 +54,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ use
 
   if (password) {
     data.password = hashPassword(password);
+  }
+
+  if (logoUrl) {
+    data.logoUrl = logoUrl;
+  }
+
+  if (backgroundUrl) {
+    data.backgroundUrl = backgroundUrl;
+  }
+
+  if (displayName) {
+    data.displayName = displayName;
   }
 
   // Only admin can change these fields

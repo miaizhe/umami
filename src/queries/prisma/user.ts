@@ -25,6 +25,9 @@ async function findUser(criteria: Prisma.UserFindUniqueArgs, options: GetUserOpt
       username: true,
       password: includePassword,
       role: true,
+      logoUrl: true,
+      backgroundUrl: true,
+      displayName: true,
       createdAt: true,
     },
   });
@@ -94,6 +97,9 @@ export async function updateUser(userId: string, data: Prisma.UserUpdateInput) {
       id: true,
       username: true,
       role: true,
+      logoUrl: true,
+      backgroundUrl: true,
+      displayName: true,
       createdAt: true,
     },
   });

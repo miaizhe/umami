@@ -1,5 +1,6 @@
 import { Column, Label } from '@umami/react-zen';
 import { useLoginQuery, useMessages } from '@/components/hooks';
+import { BackgroundSetting } from './BackgroundSetting';
 import { DateRangeSetting } from './DateRangeSetting';
 import { LanguageSetting } from './LanguageSetting';
 import { ThemeSetting } from './ThemeSetting';
@@ -30,6 +31,10 @@ export function PreferenceSettings() {
       <Column>
         <Label>{formatMessage(labels.theme)}</Label>
         <ThemeSetting />
+      </Column>
+      <Column>
+        <Label>{formatMessage(labels.backgroundImage)}</Label>
+        <BackgroundSetting />
       </Column>
     </Column>
   );
