@@ -1,11 +1,17 @@
+import kv from '@/lib/kv';
 import redis from '@/lib/redis';
+import { parseRequest } from '@/lib/request';
 import { ok } from '@/lib/response';
 
 export async function POST(request: Request) {
-  if (redis.enabled) {
-    const token = request.headers.get('authorization')?.split(' ')?.[1];
+  const { auth } = await parseRequest(request);
 
-    await redis.client.del(token);
+  if (auth?.authKey) {
+    if (redis.enabled) {
+      await redis.client.del(auth.authKey);
+    } else if (kv.enabled) {
+      await kv.delete(auth.authKey);
+    }
   }
 
   return ok();

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { uuid } from '@/lib/crypto';
+import kv from '@/lib/kv';
 import redis from '@/lib/redis';
 import { getQueryFilters, parseRequest } from '@/lib/request';
 import { json, unauthorized } from '@/lib/response';
@@ -46,7 +47,13 @@ export async function POST(request: Request) {
   const { id, name, domain, shareId } = body;
 
   if (process.env.CLOUD_MODE) {
-    const account = await redis.client.get(`account:${auth.user.id}`);
+    let account: any = null;
+
+    if (redis.enabled) {
+      account = await redis.client.get(`account:${auth.user.id}`);
+    } else if (kv.enabled) {
+      account = await kv.get(`account:${auth.user.id}`);
+    }
 
     if (!account?.hasSubscription) {
       const count = await getWebsiteCount(auth.user.id);

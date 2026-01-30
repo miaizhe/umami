@@ -1,4 +1,5 @@
 import type { Session, Website } from '@/generated/prisma/client';
+import kv from '@/lib/kv';
 import redis from '@/lib/redis';
 import { getWebsite } from '@/queries/prisma';
 import { getWebsiteSession } from '@/queries/sql';
@@ -8,6 +9,8 @@ export async function fetchWebsite(websiteId: string): Promise<Website> {
 
   if (redis.enabled) {
     website = await redis.client.fetch(`website:${websiteId}`, () => getWebsite(websiteId), 86400);
+  } else if (kv.enabled) {
+    website = await kv.fetch(`website:${websiteId}`, () => getWebsite(websiteId), 86400);
   } else {
     website = await getWebsite(websiteId);
   }
@@ -24,6 +27,12 @@ export async function fetchSession(websiteId: string, sessionId: string): Promis
 
   if (redis.enabled) {
     session = await redis.client.fetch(
+      `session:${sessionId}`,
+      () => getWebsiteSession(websiteId, sessionId),
+      86400,
+    );
+  } else if (kv.enabled) {
+    session = await kv.fetch(
       `session:${sessionId}`,
       () => getWebsiteSession(websiteId, sessionId),
       86400,
