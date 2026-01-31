@@ -52,6 +52,18 @@ export function BackgroundSetting() {
     fileInputRef.current?.click();
   };
 
+  const getPreviewUrl = (val: string) => {
+    if (!val) return '';
+    if (val === 'https://pic.2x.nz/' || val === 'https://pic.2x.nz') {
+      // 预览时固定选第一张或者随机选一张，这里为了演示选第 100 张
+      return `https://pic1.acofork.com/ri/h/100.webp`;
+    }
+    if (val.startsWith('http')) {
+      return `${process.env.basePath || ''}/api/proxy?url=${encodeURIComponent(val)}`;
+    }
+    return val;
+  };
+
   return (
     <Column gap="3">
       <Row gap="3">
@@ -68,6 +80,9 @@ export function BackgroundSetting() {
           accept="image/*"
           onChange={handleFileChange}
         />
+        <Button onPress={() => setUrl('https://pic.2x.nz/')} disabled={isPending}>
+          随机图片
+        </Button>
         <Button onPress={handleUploadClick} disabled={isPending}>
           {formatMessage(labels.upload)}
         </Button>
@@ -92,7 +107,7 @@ export function BackgroundSetting() {
               height: '120px',
               borderRadius: '8px',
               border: '1px solid #ccc',
-              backgroundImage: `url("${url.startsWith('http') ? `${process.env.basePath || ''}/api/proxy?url=${encodeURIComponent(url)}` : url}")`,
+              backgroundImage: `url("${getPreviewUrl(url)}")`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundColor: '#f0f0f0',

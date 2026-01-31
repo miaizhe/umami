@@ -17,6 +17,13 @@ export function App({ children }) {
   useEffect(() => {
     if (user?.backgroundUrl) {
       let imageUrl = user.backgroundUrl;
+
+      // 随机图 API 支持 (https://github.com/afoim/Static_RandomPicAPI)
+      if (imageUrl === 'https://pic.2x.nz/' || imageUrl === 'https://pic.2x.nz') {
+        const num = Math.floor(Math.random() * 1074) + 1;
+        imageUrl = `https://pic1.acofork.com/ri/h/${num}.webp`;
+      }
+
       if (imageUrl.startsWith('http')) {
         imageUrl = `${process.env.basePath || ''}/api/proxy?url=${encodeURIComponent(imageUrl)}`;
       }
