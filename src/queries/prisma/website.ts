@@ -1,6 +1,5 @@
 import type { Prisma } from '@/generated/prisma/client';
 import { ROLES } from '@/lib/constants';
-import kv from '@/lib/kv';
 import prisma from '@/lib/prisma';
 import redis from '@/lib/redis';
 import type { QueryFilters } from '@/lib/types';
@@ -119,17 +118,10 @@ export async function resetWebsite(websiteId: string) {
     },
   ).then(async data => {
     if (cloudMode) {
-      if (redis.enabled) {
-        await redis.client.set(
-          `website:${websiteId}`,
-          data.find(website => website.id),
-        );
-      } else if (kv.enabled) {
-        await kv.set(
-          `website:${websiteId}`,
-          data.find(website => website.id),
-        );
-      }
+      await redis.client.set(
+        `website:${websiteId}`,
+        data.find(website => website.id),
+      );
     }
 
     return data;
@@ -179,11 +171,7 @@ export async function deleteWebsite(websiteId: string) {
     },
   ).then(async data => {
     if (cloudMode) {
-      if (redis.enabled) {
-        await redis.client.del(`website:${websiteId}`);
-      } else if (kv.enabled) {
-        await kv.delete(`website:${websiteId}`);
-      }
+      await redis.client.del(`website:${websiteId}`);
     }
 
     return data;

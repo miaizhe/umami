@@ -3,7 +3,6 @@ import { ROLE_PERMISSIONS, ROLES, SHARE_TOKEN_HEADER } from '@/lib/constants';
 import { secret } from '@/lib/crypto';
 import { getRandomChars } from '@/lib/generate';
 import { createSecureToken, parseSecureToken, parseToken } from '@/lib/jwt';
-import kv from '@/lib/kv';
 import redis from '@/lib/redis';
 import { ensureArray } from '@/lib/utils';
 import { getUser } from '@/queries/prisma/user';
@@ -26,17 +25,11 @@ export async function checkAuth(request: Request) {
 
   if (userId) {
     user = await getUser(userId);
-  } else if (authKey) {
-    if (redis.enabled) {
-      const key = await redis.client.get(authKey);
-      if (key?.userId) {
-        user = await getUser(key.userId);
-      }
-    } else if (kv.enabled) {
-      const key = await kv.get(authKey);
-      if (key?.userId) {
-        user = await getUser(key.userId);
-      }
+  } else if (redis.enabled && authKey) {
+    const key = await redis.client.get(authKey);
+
+    if (key?.userId) {
+      user = await getUser(key.userId);
     }
   }
 
@@ -68,8 +61,6 @@ export async function saveAuth(data: any, expire = 0) {
     if (expire) {
       await redis.client.expire(authKey, expire);
     }
-  } else if (kv.enabled) {
-    await kv.set(authKey, data, expire ? { expirationTtl: expire } : undefined);
   }
 
   return createSecureToken({ authKey }, secret());

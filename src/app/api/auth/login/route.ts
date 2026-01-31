@@ -3,7 +3,6 @@ import { saveAuth } from '@/lib/auth';
 import { ROLES } from '@/lib/constants';
 import { secret } from '@/lib/crypto';
 import { createSecureToken } from '@/lib/jwt';
-import kv from '@/lib/kv';
 import { checkPassword } from '@/lib/password';
 import redis from '@/lib/redis';
 import { parseRequest } from '@/lib/request';
@@ -34,7 +33,7 @@ export async function POST(request: Request) {
 
   let token: string;
 
-  if (redis.enabled || kv.enabled) {
+  if (redis.enabled) {
     token = await saveAuth({ userId: id, role });
   } else {
     token = createSecureToken({ userId: user.id, role }, secret());
